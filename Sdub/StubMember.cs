@@ -1,11 +1,13 @@
+using System.Reflection;
+
 namespace Sdub;
 
 public class StubMember<TMember>
 {
     private readonly Stub _stub;
-    private readonly string _memberName;
+    private readonly MemberInfo _memberName;
 
-    public StubMember(Stub stub, string memberName)
+    public StubMember(Stub stub, MemberInfo memberName)
     {
         _stub = stub;
         _memberName = memberName;

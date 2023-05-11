@@ -1,11 +1,13 @@
-﻿namespace Sdub;
+﻿using System.Reflection;
+
+namespace Sdub;
 
 public class AsyncStubMember<TMember>
 {
     private readonly Stub _stub;
-    private readonly string _memberName;
+    private readonly MemberInfo _memberName;
 
-    public AsyncStubMember(Stub stub, string memberName)
+    public AsyncStubMember(Stub stub, MemberInfo memberName)
     {
         _stub = stub;
         _memberName = memberName;
