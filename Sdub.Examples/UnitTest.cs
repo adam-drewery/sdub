@@ -77,15 +77,15 @@ public class UnitTest
         token.Should().BeNull();
     }
     
-    // [Fact]
-    // public async Task ReturnDefaultWhenReturnValueNotExplicitlySetAsync()
-    // {
-    //     _accountClient = new StubAccountClient();
-    //     
-    //     var account = await _accountClient.GetAccountAsync("123");
-    //     
-    //     account.Should().BeNull();
-    // }
+    [Fact]
+    public async Task ReturnDefaultWhenReturnValueNotExplicitlySetAsync()
+    {
+        _accountClient = new StubAccountClient();
+        
+        var account = await _accountClient.GetAccountAsync("123");
+        
+        account.Should().BeNull();
+    }
     
     [Fact] 
     public async Task CheckCallCount()
