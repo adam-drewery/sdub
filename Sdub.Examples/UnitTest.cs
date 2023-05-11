@@ -18,7 +18,7 @@ public class UnitTest
     {
         Stub
             .Setup(() => _accountClient.GetAccountAsync(null))
-            .Returns(Task.FromResult(_account));
+            .Returns(_account);
     }
 
     [Fact]
@@ -30,12 +30,24 @@ public class UnitTest
         account.Name.Should().Be("John Doe");
     }
 
+    [Fact]
+    public async Task NonAsyncMethod()
+    {
+        Stub
+            .Setup(() => _accountClient.GetToken())
+            .Returns("yes");
+        
+        var token = _accountClient.GetToken();
+
+        token.Should().NotBeNull();
+    }
+
     [Fact] 
     public async Task ReturnNull()
     {
         Stub
             .Setup(() => _accountClient.GetAccountAsync(null))
-            .Returns(Task.FromResult<Account>(null));
+            .Returns(null);
         
         var account = await _accountClient.GetAccountAsync("123");
         
@@ -46,7 +58,7 @@ public class UnitTest
     public async Task CheckCallCount()
     {
         Stub.Setup(() => _accountClient.GetAccountAsync(null))
-            .Returns(Task.FromResult<Account>(null));
+            .Returns(null);
         
         await _accountClient.GetAccountAsync("123");
 

@@ -21,30 +21,22 @@ public abstract class Stub
         return new StubMember<TResult>((Stub)target, methodName);
     }
 
+    public static AsyncStubMember<TResult> Setup<TResult>(Expression<Func<Task<TResult>>> expression)
+    {
+        var methodCall = (MethodCallExpression)expression.Body;
+        var methodInfo = methodCall.Method;
+        var target = ExpressionEvaluator.Evaluate(methodCall.Object);
+        var methodName = methodInfo.Name;
+
+        return new AsyncStubMember<TResult>((Stub)target, methodName);
+    }
+
     protected dynamic Invoke([CallerMemberName] string memberName = "")
     {
         Calls.Add((memberName, Array.Empty<object>()));
         return ReturnValues.TryGetValue(memberName, out var value) ? value : default(dynamic);
     }
-    
-    protected dynamic Invoke(object param1, [CallerMemberName] string memberName = "")
-    {
-        Calls.Add((memberName, new [] { param1 }));
-        return ReturnValues.TryGetValue(memberName, out var value) ? value : default(dynamic);
-    }
-    
-    protected dynamic Invoke(object param1, object param2, [CallerMemberName] string memberName = "")
-    {
-        Calls.Add((memberName, new [] { param1, param2 }));
-        return ReturnValues.TryGetValue(memberName, out var value) ? value : default(dynamic);
-    }
-    
-    protected dynamic Invoke(object param1, object param2, object param3, [CallerMemberName] string memberName = "")
-    {
-        Calls.Add((memberName, new [] { param1, param2, param3 }));
-        return ReturnValues.TryGetValue(memberName, out var value) ? value : default(dynamic);
-    }
-    
+        
     protected dynamic Invoke(object[] @params, [CallerMemberName] string memberName = "")
     {
         Calls.Add((memberName, @params));
