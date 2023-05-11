@@ -16,8 +16,7 @@ public class UnitTest
 
     public UnitTest()
     {
-        Stub
-            .Setup(() => _accountClient.GetAccountAsync(null))
+        Stub.Setup(() => _accountClient.GetAccountAsync(null))
             .Returns(_account);
     }
 
@@ -31,7 +30,7 @@ public class UnitTest
     }
 
     [Fact]
-    public async Task NonAsyncMethod()
+    public void NonAsyncMethod()
     {
         Stub
             .Setup(() => _accountClient.GetToken())
@@ -40,6 +39,7 @@ public class UnitTest
         var token = _accountClient.GetToken();
 
         token.Should().NotBeNull();
+        token.Should().Be("yes");
     }
 
     [Fact] 

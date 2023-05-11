@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Dynamic;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
@@ -43,7 +42,7 @@ public abstract class Stub
         return ReturnValues.TryGetValue(memberName, out var value) ? value : default(dynamic);
     }
     
-    public static IList<object[]> CallsTo<TResult>(Expression<Func<TResult>> expression)
+    public static IEnumerable<object[]> CallsTo<TResult>(Expression<Func<TResult>> expression)
     {
         var methodCall = (MethodCallExpression)expression.Body;
         var methodInfo = methodCall.Method;
@@ -52,7 +51,6 @@ public abstract class Stub
 
         return target.Calls
             .Where(x => x.Item1 == methodName)
-            .Select(x => x.Item2)
-            .ToList();
+            .Select(x => x.Item2);
     }
 }
