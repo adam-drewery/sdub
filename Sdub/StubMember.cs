@@ -13,6 +13,11 @@ public class StubMember<TMember>
     
     public void Returns(TMember value)
     {
-        _stub.ReturnValues[_memberName] = value;
+        _stub.ReturnValues[_memberName] = _ => value;
+    }
+    
+    public void Returns(Func<object[], object> func)
+    {
+        _stub.ReturnValues[_memberName] = func;
     }
 }

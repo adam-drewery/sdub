@@ -8,7 +8,7 @@ public abstract class Stub
 {
     internal ConcurrentBag<(string, object[])> Calls { get; } = new();
 
-    internal IDictionary<string, object> ReturnValues { get; } = new ConcurrentDictionary<string, object>();
+    internal IDictionary<string, Func<object[], object>> ReturnValues { get; } = new ConcurrentDictionary<string, Func<object[], object>>();
     
     public static StubMember<TResult> Setup<TResult>(Expression<Func<TResult>> expression)
     {
@@ -33,13 +33,15 @@ public abstract class Stub
     protected dynamic Invoke([CallerMemberName] string memberName = "")
     {
         Calls.Add((memberName, Array.Empty<object>()));
-        return ReturnValues.TryGetValue(memberName, out var value) ? value : default(dynamic);
+        var func = ReturnValues.TryGetValue(memberName, out var value) ? value : _ => default;
+        return func(Array.Empty	<object>());
     }
         
     protected dynamic Invoke(object[] @params, [CallerMemberName] string memberName = "")
     {
         Calls.Add((memberName, @params));
-        return ReturnValues.TryGetValue(memberName, out var value) ? value : default(dynamic);
+        var func =  ReturnValues.TryGetValue(memberName, out var value) ? value : _ => default;
+        return func(@params);
     }
     
     public static IEnumerable<object[]> CallsTo<TResult>(Expression<Func<TResult>> expression)

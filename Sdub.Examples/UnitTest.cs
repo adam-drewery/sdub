@@ -5,7 +5,7 @@ namespace Sdub.Examples;
 
 public class UnitTest
 {
-    private readonly StubAccountClient _accountClient = new();
+    private StubAccountClient _accountClient = new();
 
     private readonly Account _account = new()
     {
@@ -18,6 +18,9 @@ public class UnitTest
     {
         Stub.Setup(() => _accountClient.GetAccountAsync(null))
             .Returns(_account);
+        
+        Stub.Setup(() => _accountClient.GetToken())
+            .Returns("this is my token");
     }
 
     [Fact]
@@ -32,8 +35,7 @@ public class UnitTest
     [Fact]
     public void NonAsyncMethod()
     {
-        Stub
-            .Setup(() => _accountClient.GetToken())
+        Stub.Setup(() => _accountClient.GetToken())
             .Returns("yes");
         
         var token = _accountClient.GetToken();
@@ -42,23 +44,54 @@ public class UnitTest
         token.Should().Be("yes");
     }
 
-    [Fact] 
-    public async Task ReturnNull()
+    [Fact]
+    public async Task AsyncFunctionReturn()
     {
-        Stub
-            .Setup(() => _accountClient.GetAccountAsync(null))
-            .Returns(null);
-        
-        var account = await _accountClient.GetAccountAsync("123");
-        
+        Stub.Setup(() => _accountClient.GetAccountAsync(null))
+            .Returns(_ => Task.FromResult<Account>(null));
+
+        var account = await _accountClient.GetAccountAsync("yo");
+
         account.Should().BeNull();
     }
+
+    [Fact]
+    public void FunctionReturn()
+    {
+        Stub.Setup(() => _accountClient.GetToken())
+            .Returns(_ => new Random().NextInt64().ToString());
+        
+        var token = _accountClient.GetToken();
+
+        token.Should().NotBeNull();
+        token.Should().HaveLength(19);
+    }
+
+    [Fact]
+    public void ReturnDefaultWhenReturnValueNotExplicitlySet()
+    {
+        _accountClient = new StubAccountClient();
+        
+        var token = _accountClient.GetToken();
+        
+        token.Should().BeNull();
+    }
+    
+    // [Fact]
+    // public async Task ReturnDefaultWhenReturnValueNotExplicitlySetAsync()
+    // {
+    //     _accountClient = new StubAccountClient();
+    //     
+    //     var account = await _accountClient.GetAccountAsync("123");
+    //     
+    //     account.Should().BeNull();
+    // }
     
     [Fact] 
     public async Task CheckCallCount()
     {
         Stub.Setup(() => _accountClient.GetAccountAsync(null))
-            .Returns(null);
+            .Returns(_account);
         
         await _accountClient.GetAccountAsync("123");
 

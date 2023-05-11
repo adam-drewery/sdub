@@ -13,6 +13,11 @@ public class AsyncStubMember<TMember>
     
     public void Returns(TMember value)
     {
-        _stub.ReturnValues[_memberName] = Task.FromResult(value);
+        _stub.ReturnValues[_memberName] = _ => Task.FromResult(value);
+    }
+    
+    public void Returns(Func<object[], Task<TMember>> func)
+    {
+        _stub.ReturnValues[_memberName] = func;
     }
 }
