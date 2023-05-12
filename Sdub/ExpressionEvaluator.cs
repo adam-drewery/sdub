@@ -1,9 +1,8 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace Sdub;
 
-internal class ExpressionEvaluator
+internal static class ExpressionEvaluator
 {
     public static object Evaluate(Expression expression)
     {
@@ -42,13 +41,13 @@ internal class ExpressionEvaluator
         throw new ArgumentException("Unsupported expression type.");
     }
 
-    private static object[] EvaluateArguments(ReadOnlyCollection<Expression> arguments)
+    private static object[] EvaluateArguments(IReadOnlyList<Expression> arguments)
     {
         if (arguments == null)
             return null;
 
         var evaluatedArguments = new object[arguments.Count];
-        for (int i = 0; i < arguments.Count; i++)
+        for (var i = 0; i < arguments.Count; i++)
         {
             evaluatedArguments[i] = Evaluate(arguments[i]);
         }

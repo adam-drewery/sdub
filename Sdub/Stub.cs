@@ -7,12 +7,12 @@ namespace Sdub;
 
 public abstract class Stub
 {
-    readonly BindingFlags bindingFlags = BindingFlags.Instance
-        | BindingFlags.FlattenHierarchy
-        | BindingFlags.NonPublic
+    private const BindingFlags DefaultBindingFlags = BindingFlags.Instance 
+        | BindingFlags.FlattenHierarchy 
+        | BindingFlags.NonPublic 
         | BindingFlags.Public;
 
-    internal ConcurrentBag<(MemberInfo, object[])> Calls { get; } = new();
+    private readonly ConcurrentBag<(MemberInfo, object[])> _calls = new();
 
     internal IDictionary<MemberInfo, Func<object[], object>> ReturnValues { get; } =
         new ConcurrentDictionary<MemberInfo, Func<object[], object>>();
@@ -37,10 +37,10 @@ public abstract class Stub
 
     protected dynamic Invoke([CallerMemberName] string memberName = "")
     {
-        var methodInfo = GetType().GetMethod(memberName, bindingFlags, Array.Empty<Type>());
+        var methodInfo = GetType().GetMethod(memberName, DefaultBindingFlags, Array.Empty<Type>());
         if (methodInfo == null) throw new MissingMethodException(memberName);
 
-        Calls.Add((methodInfo, Array.Empty<object>()));
+        _calls.Add((methodInfo, Array.Empty<object>()));
         var func = ReturnValues.TryGetValue(methodInfo, out var value) ? value : _ => GetDefaultReturnValue(methodInfo);
         return func(Array.Empty<object>());
     }
@@ -48,10 +48,10 @@ public abstract class Stub
     protected dynamic Invoke(object[] @params, [CallerMemberName] string memberName = "")
     {
         var paramTypes = @params.Select(x => x.GetType()).ToArray();
-        var methodInfo = GetType().GetMethod(memberName, bindingFlags, paramTypes);
+        var methodInfo = GetType().GetMethod(memberName, DefaultBindingFlags, paramTypes);
         if (methodInfo == null) throw new MissingMethodException(memberName);
 
-        Calls.Add((methodInfo, @params));
+        _calls.Add((methodInfo, @params));
         var func = ReturnValues.TryGetValue(methodInfo, out var value) ? value : _ => GetDefaultReturnValue(methodInfo);
         return func(@params);
     }
@@ -92,7 +92,7 @@ public abstract class Stub
         var methodInfo = methodCall.Method;
         var target = (Stub)ExpressionEvaluator.Evaluate(methodCall.Object);
 
-        return target.Calls
+        return target._calls
             .Where(x => x.Item1 == methodInfo)
             .Select(x => x.Item2);
     }
